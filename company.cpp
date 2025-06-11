@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
-#include "test1.h"
+#include "test.h"
 
 class Company;
 
@@ -112,8 +112,63 @@ TEST(CompanyTest, StrategyEffect) {
     return true;
 }
 
+TEST(CompanyTest, ZeroBudgetAndSessions) {
+    std::vector<Strategy *> plan = {
+        new MarketingCampaign(0),
+        new TrainingProgram(0)
+    };
+
+    Company c(50000, 20000, 70, 80, plan);
+    c.execute();
+
+    ASSERT_EQ(c.getRevenue(), 50000);
+    ASSERT_EQ(c.getExpenses(), 20000);
+    ASSERT_EQ(c.getSatisfaction(), 70);
+    ASSERT_EQ(c.getQuality(), 80);
+
+    return true;
+}
+
+TEST(CompanyTest, MaxEffectCap) {
+    std::vector<Strategy *> plan = {
+        new MarketingCampaign(100000),
+        new TrainingProgram(20)
+    };
+
+    Company c(50000, 20000, 70, 80, plan);
+    c.execute();
+
+    ASSERT_EQ(c.getRevenue(), 50000 * 2);
+    ASSERT_EQ(c.getExpenses(), 20000 + 100000);
+    ASSERT_EQ(c.getSatisfaction(), 70 + 10);
+    ASSERT_EQ(c.getQuality(), 80 + 10);
+
+    return true;
+}
+
+TEST(CompanyTest, MultipleExecutions) {
+    std::vector<Strategy *> plan = {
+        new MarketingCampaign(500),
+        new TrainingProgram(3)
+    };
+
+    Company c(50000, 20000, 70, 80, plan);
+    c.execute();
+    c.execute();
+
+    ASSERT_TRUE(c.getRevenue() > 50000);
+    ASSERT_TRUE(c.getExpenses() > 20000);
+    ASSERT_TRUE(c.getSatisfaction() > 70);
+    ASSERT_TRUE(c.getQuality() > 80);
+
+    return true;
+}
+
 int main() {
     RUN_TEST(CompanyTest, Initialization);
     RUN_TEST(CompanyTest, StrategyEffect);
+    RUN_TEST(CompanyTest, ZeroBudgetAndSessions);
+    RUN_TEST(CompanyTest, MaxEffectCap);
+    RUN_TEST(CompanyTest, MultipleExecutions);
     return 0;
 }
