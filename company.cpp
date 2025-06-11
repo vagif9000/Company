@@ -140,8 +140,8 @@ TEST(CompanyTest, MaxEffectCap) {
 
     ASSERT_EQ(c.getRevenue(), 50000 * 2);
     ASSERT_EQ(c.getExpenses(), 20000 + 100000);
-    ASSERT_EQ(c.getSatisfaction(), 70 + 10);
-    ASSERT_EQ(c.getQuality(), 80 + 10);
+    ASSERT_EQ(c.getSatisfaction(), 80);
+    ASSERT_EQ(c.getQuality(), 90);
 
     return true;
 }
@@ -164,11 +164,44 @@ TEST(CompanyTest, MultipleExecutions) {
     return true;
 }
 
+TEST(CompanyTest, NegativeValuesInput) {
+    std::vector<Strategy *> plan = {
+        new MarketingCampaign(100),
+        new TrainingProgram(2)
+    };
+
+    Company c(-50000, -20000, -10, -5, plan);
+    c.execute();
+
+    ASSERT_TRUE(c.getRevenue() < 0);
+    ASSERT_TRUE(c.getExpenses() < 0);
+    ASSERT_TRUE(c.getSatisfaction() > -10);
+    ASSERT_TRUE(c.getQuality() > -5);
+
+    return true;
+}
+
+TEST(CompanyTest, NoStrategies) {
+    std::vector<Strategy *> plan;
+    Company c(10000, 5000, 60, 70, plan);
+
+    c.execute();
+
+    ASSERT_EQ(c.getRevenue(), 10000);
+    ASSERT_EQ(c.getExpenses(), 5000);
+    ASSERT_EQ(c.getSatisfaction(), 60);
+    ASSERT_EQ(c.getQuality(), 70);
+
+    return true;
+}
+
 int main() {
     RUN_TEST(CompanyTest, Initialization);
     RUN_TEST(CompanyTest, StrategyEffect);
     RUN_TEST(CompanyTest, ZeroBudgetAndSessions);
     RUN_TEST(CompanyTest, MaxEffectCap);
     RUN_TEST(CompanyTest, MultipleExecutions);
+    RUN_TEST(CompanyTest, NegativeValuesInput);
+    RUN_TEST(CompanyTest, NoStrategies);
     return 0;
 }
