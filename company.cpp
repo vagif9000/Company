@@ -194,7 +194,22 @@ TEST(CompanyTest, NoStrategies) {
 
     return true;
 }
+TEST(CompanyTest, LargeBudgetSmallSessions) {
+    std::vector<Strategy *> plan = {
+        new MarketingCampaign(2000),
+        new TrainingProgram(1)
+    };
 
+    Company c(50000, 20000, 70, 80, plan);
+    c.execute();
+
+    ASSERT_TRUE(c.getRevenue() > 50000);
+    ASSERT_TRUE(c.getExpenses() > 20000);
+    ASSERT_TRUE(c.getSatisfaction() > 70);
+    ASSERT_TRUE(c.getQuality() > 80);
+
+    return true;
+}
 int main() {
     RUN_TEST(CompanyTest, Initialization);
     RUN_TEST(CompanyTest, StrategyEffect);
@@ -203,5 +218,6 @@ int main() {
     RUN_TEST(CompanyTest, MultipleExecutions);
     RUN_TEST(CompanyTest, NegativeValuesInput);
     RUN_TEST(CompanyTest, NoStrategies);
+    RUN_TEST(CompanyTest, LargeBudgetSmallSessions);
     return 0;
 }
